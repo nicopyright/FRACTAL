@@ -94,9 +94,11 @@ def julia(surface: [pygame.Surface, pygame.SurfaceType],
             if div[0]:
 
                 pygame.draw.line(surface,
-                                 ((255 - div[1] ** 2) % 255, (255 - div[1] ** 2) % 255, 255),
+                                 (((50-div[1])*255/50, (50-div[1])*128/50, 255)),
                                  complex_plan_to_screen((i, j)), complex_plan_to_screen((i, j)))
             else:
                 pygame.draw.line(surface,
-                                 (255, (255 - div[1] ** 2) % 255, (255 - div[1] ** 2) % 255),
+                                 ((255-div[1]**2)%255, (255-div[1]**2)%255, (255-div[1]**2)%255),
                                  complex_plan_to_screen((i, j)), complex_plan_to_screen((i, j)))
+
+            pygame.display.flip()
