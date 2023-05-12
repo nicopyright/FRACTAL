@@ -1,11 +1,11 @@
+import pygame
 from Class.Complex import *
-from conversion import *
+from Functions.conversion import *
 
 
 def divergence(z: Complex(), w: Complex) -> [bool, int]:
     """
     Verify if the coordinates diverge with the equation z² + w
-
     :param z: complex for each coordinates
     :param w: complex number for the Julia set
     :return: [bool, int]
@@ -95,8 +95,8 @@ def julia(surface: [pygame.Surface, pygame.SurfaceType],
 
                 pygame.draw.line(surface,
                                  ((255 - div[1] ** 2) % 255, (255 - div[1] ** 2) % 255, 255),
-                                 complex_plane_to_screen((i, j)), complex_plane_to_screen((i, j)))
+                                 complex_plan_to_screen((i, j)), complex_plan_to_screen((i, j)))
             else:
                 pygame.draw.line(surface,
                                  (255, (255 - div[1] ** 2) % 255, (255 - div[1] ** 2) % 255),
-                                 complex_plane_to_screen((i, j)), complex_plane_to_screen((i, j)))
+                                 complex_plan_to_screen((i, j)), complex_plan_to_screen((i, j)))
