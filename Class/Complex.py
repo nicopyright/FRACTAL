@@ -1,5 +1,6 @@
 # Complex class file.
 # we need to use complexes for the Julia set of fractals
+
 class Complex:
     def __init__(self,
                  r: float = 0.0,

@@ -6,6 +6,7 @@ import pygame
 from multiprocessing import Process, cpu_count
 import time
 import threading
+from decimal import Decimal
 
 pygame.init()
 
@@ -20,7 +21,7 @@ v_center = (v_screen_width // 2, v_screen_height // 2)
 
 v_targ = "julia"
 
-v_w = Complex(-1.0, 0.0)
+v_w = Complex(-1, 0)
 v_width = 400
 v_height = 400
 v_zoom = 100
@@ -39,21 +40,31 @@ if __name__ == "__main__":
     t_mouseY = [0.0] * 50
     v_k = 0
 
+    start = time.time()
     if v_targ == "julia":
         v_ths = [[threading.Thread(target=julia, args=(
             v_window, i * (v_height // v_spreadX), j * (v_width // v_spreadY),
-            (i + 1) * (v_height // v_spreadX), (j + 1) * (v_width // v_spreadY), v_w,
-            0, 0,
+            (i + 1) * (v_height // v_spreadX), (j + 1) * (v_width // v_spreadY), v_w, 0, 0,
             v_zoom)) for i in range(-v_spreadX // 2, v_spreadX // 2)] for j in
                  range(-v_spreadY // 2, v_spreadY // 2)]
 
-        for thx in v_ths:
-            for th in thx:
-                th.start()
+    elif v_targ == "mandelbrot":
+        v_ths = [[threading.Thread(target=mandelbrot, args=(
+            v_window, i * (v_width // v_spreadX), j * (v_height // v_spreadY), (i + 1) * (v_width // v_spreadX),
+            (j + 1) * (v_height // v_spreadY), 0, 0,
+            v_zoom)) for i in range(-v_spreadX // 2, v_spreadX // 2)] for j in range(-v_spreadY // 2, v_spreadY // 2)]
 
-        for thx in v_ths:
-            for th in thx:
-                th.join()
+    for thx in v_ths:
+        for th in thx:
+            th.start()
+
+    for thx in v_ths:
+        for th in thx:
+            th.join()
+
+
+    end = time.time()
+    print(end-start)
 
     # main loop
     while v_cont:
@@ -82,13 +93,23 @@ if __name__ == "__main__":
                         t_mouseX[v_k], t_mouseY[v_k], v_zoom)) for i in range(-v_spreadX // 2, v_spreadX // 2)] for j in
                            range(-v_spreadY // 2, v_spreadY // 2)]
 
-                    for thx in v_ths:
-                        for th in thx:
-                            th.start()
+                elif v_targ == "mandelbrot":
+                    v_ths = [[threading.Thread(target=mandelbrot, args=(
+                        v_window, i * (v_width // v_spreadX), j * (v_height // v_spreadY), (i + 1) * (v_width // v_spreadX),
+                        (j + 1) * (v_height // v_spreadY), t_mouseX[v_k], t_mouseY[v_k],
+                        v_zoom)) for i in range(-v_spreadX // 2, v_spreadX // 2)] for j in range(-v_spreadY // 2, v_spreadY // 2)]
 
-                    for thx in v_ths:
-                        for th in thx:
-                            th.join()
+
+                for thx in v_ths:
+                    for th in thx:
+                        th.start()
+
+                for thx in v_ths:
+                    for th in thx:
+                        th.join()
+
+                end = time.time()
+                print(end-start)
 
 
         # refresh display

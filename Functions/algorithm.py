@@ -2,6 +2,7 @@ import pygame
 from Class.Complex import *
 from Functions.conversion import *
 
+v_color_mod = 50
 
 def divergence(z: Complex(), w: Complex) -> [bool, int]:
     """
@@ -94,7 +95,7 @@ def julia(surface: [pygame.Surface, pygame.SurfaceType],
             if div[0]:
 
                 pygame.draw.line(surface,
-                                 (((50-div[1])*255/50, (50-div[1])*128/50, 255)),
+                                 (((v_color_mod-div[1])*255/v_color_mod, (v_color_mod-div[1])*128/v_color_mod, 255)),
                                  complex_plan_to_screen((i, j)), complex_plan_to_screen((i, j)))
             else:
                 pygame.draw.line(surface,
@@ -102,3 +103,55 @@ def julia(surface: [pygame.Surface, pygame.SurfaceType],
                                  complex_plan_to_screen((i, j)), complex_plan_to_screen((i, j)))
 
             pygame.display.flip()
+
+
+def mandelbrot(surface, x0, y0, x1, y1, offset_x: float = 0., offset_y: float = 0., zoom: float = 300.):
+    """
+        Display the Mandelbrot set linked to w on a rectangle with (x0,y0) on the top left coordinates
+        and (x1,y1) on the bottom right coordinates
+
+        :param surface: Pygame surface on which to display the fractal
+        :param x0: x of the top left coordinates
+        :param y0: y of the top left coordinates
+        :param x1: x of the bottom right coordinates
+        :param y1: y of the bottom right coordinates
+        :param offset_x: offset on x-axis
+        :param offset_y: offset on y-axis
+        :param zoom: value of the zoom
+        """
+    zero = Complex(0.0, 0.0)
+    invi = False
+    invj = False
+    if x0 > x1:
+        invi = True
+        x0,x1 = x1,x0
+    if y0 > y1:
+        invj = True
+        y0,y1 = y1,y0
+    for i in range(x0, x1 + 1):
+        if invi:
+            i = x1 - i + x0
+
+        for j in range(y0, y1 + 1):
+            if invj:
+                j = y1 - j + y0
+            z = Complex(i / zoom + offset_x, j / zoom + offset_y)
+            div = divergence(zero, z)
+
+            if divergence(zero,z)[0]:
+                pygame.draw.line(
+                    surface,
+                    (((v_color_mod-div[1])*255/v_color_mod, (v_color_mod-div[1])*128/v_color_mod, 255)),
+                    complex_plan_to_screen((i, j)), complex_plan_to_screen((i, j)))
+
+            elif not divergence(zero,z)[0]:
+                pygame.draw.line(
+                    surface,
+                    ((255-div[1]**2)%255, (255-div[1]**2)%255, (255-div[1]**2)%255),
+                    complex_plan_to_screen((i, j)), complex_plan_to_screen((i, j)))
+
+            pygame.display.flip()
+
+
+
+
