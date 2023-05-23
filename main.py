@@ -2,6 +2,7 @@
 from Class.Complex import *
 from Functions.algorithm import *
 from Functions.conversion import *
+from Functions.video_encoding import *
 import pygame
 from multiprocessing import Process, cpu_count
 import time
@@ -25,16 +26,16 @@ v_targ = "julia"
 v_w = Complex(-1, 0)
 v_width = 400
 v_height = 400
-v_zoom = 100
+v_zoom = 200
 v_spreadX = cpu_count() * 2
 v_spreadY = cpu_count() * 2
 
 
 if __name__ == "__main__":
 
-    v_window = pygame.display.set_mode((v_screen_width // 2, v_screen_height // 2), pygame.RESIZABLE)
+    v_window = pygame.display.set_mode((v_screen_width , v_screen_height), pygame.FULLSCREEN)
     v_window.fill("white")
-
+    pygame.display.flip()
     v_cont = True
 
     t_mouseX = [0.0] * 50
@@ -62,7 +63,7 @@ if __name__ == "__main__":
     for thx in v_ths:
         for th in thx:
             th.join()
-
+    pygame.image.save(v_window, "Capture\cap0.png")
     end = time.time()
     print(end-start)
 
@@ -77,7 +78,8 @@ if __name__ == "__main__":
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     v_cont = False
-
+                if event.key == pygame.K_e:
+                    encode('.\Capture_For_Video\*.png', '.\Videos\project.avi', 15)
             elif pygame.mouse.get_pressed()[0]:
                 start = time.time()
                 v_k += 1
@@ -110,7 +112,9 @@ if __name__ == "__main__":
 
                 end = time.time()
                 print(end-start)
-
+                pygame.display.flip()
+                v_title="cap{}.png".format(v_k)
+                pygame.image.save(v_window,"Capture\{}".format(v_title))
 
         # refresh display
         pygame.display.flip()
