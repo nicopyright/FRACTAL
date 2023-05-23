@@ -1,6 +1,7 @@
 import pygame
 from Class.Complex import *
 from Functions.conversion import *
+from threading import Thread
 
 v_color_mod = 50
 
@@ -92,15 +93,22 @@ def julia(surface: [pygame.Surface, pygame.SurfaceType],
 
             # Use the function divergence() to display the right color one the screen
             div = divergence(z, w)
+            pos = complex_plan_to_screen((i, j))
             if div[0]:
 
                 pygame.draw.line(surface,
                                  (((v_color_mod-div[1])*255/v_color_mod, (v_color_mod-div[1])*128/v_color_mod, 255)),
                                  complex_plan_to_screen((i, j)), complex_plan_to_screen((i, j)))
+
+                #surface.set_at((pos[0], pos[1]), (((v_color_mod-div[1])*255/v_color_mod, (v_color_mod-div[1])*128/v_color_mod, 255)))
+
             else:
                 pygame.draw.line(surface,
                                  ((255-div[1]**2)%255, (255-div[1]**2)%255, (255-div[1]**2)%255),
                                  complex_plan_to_screen((i, j)), complex_plan_to_screen((i, j)))
+
+                #surface.set_at((pos[0], pos[1]), ((255-div[1]**2)%255, (255-div[1]**2)%255, (255-div[1]**2)%255))
+
 
             pygame.display.flip()
 
@@ -153,5 +161,41 @@ def mandelbrot(surface, x0, y0, x1, y1, offset_x: float = 0., offset_y: float = 
             pygame.display.flip()
 
 
+def multithreading(v_window, v_width:int, v_height:int, v_spreadX:int, v_spreadY:int, t_mouseX:list, t_mouseY:list, v_zoom:int, v_targ:str, v_w:"Complex", v_k:int = 0):
+    """
+    Display the fractal algorithm with multithreading
+    :param v_window: Pygame surface on which to display the fractal
+    :param v_width: width of the window
+    :param v_height: height of the window
+    :param v_spreadX: number of threads on the width
+    :param v_spreadY: number of threads on the height
+    :param t_mouseX: all x coordinates of zoom
+    :param t_mouseY: all y coordinates of zoom
+    :param v_zoom: zoom size
+    :param v_targ: wich fractal algorithm
+    :param v_w: w
+    :param v_k: mouseX and mouseY indice
+    :return: None
+    """
+    if v_targ == "julia":
+        v_ths = [[Thread(target=julia, args=(
+            v_window, i * (v_width // v_spreadX), j * (v_height // v_spreadY), (i + 1) * (v_width // v_spreadX),
+            (j + 1) * (v_height // v_spreadY), v_w,
+            t_mouseX[v_k], t_mouseY[v_k], v_zoom)) for i in range(-v_spreadX // 2, v_spreadX // 2)] for j in
+                 range(-v_spreadY // 2, v_spreadY // 2)]
 
+    elif v_targ == "mandelbrot":
+        v_ths = [[Thread(target=mandelbrot, args=(
+            v_window, i * (v_height // v_spreadX), j * (v_width // v_spreadY), (i + 1) * (v_height // v_spreadX),
+            (j + 1) * (v_width // v_spreadY), t_mouseX[v_k], t_mouseY[v_k],
+            v_zoom)) for i in range(-v_spreadX // 2, v_spreadX // 2)] for j in range(-v_spreadY // 2, v_spreadY // 2)]
+
+    for thx in v_ths:
+        for th in thx:
+            th.start()
+    for thx in v_ths:
+        for th in thx:
+            th.join()
+
+    #pygame.display.flip()
 
