@@ -59,13 +59,11 @@ if __name__ == "__main__":
                 if event.key == pygame.K_ESCAPE:
                     v_cont = False
                 if event.key == pygame.K_e:
-                    encode('.\Capture_For_Video\*.png', '.\Videos\project.avi', 15)
-                elif event.type == pygame.VIDEORESIZE:
-                    v_height = event.h
-                    v_width = event.w
-                    v_window.fill("white")
-
-            elif pygame.mouse.get_pressed()[0]:
+                    encode('.\Capture_For_Video\*.png', '.\Videos\project.avi', 3)
+            elif event.type == pygame.VIDEORESIZE:
+                v_height = event.h
+                v_width = event.w
+                v_window.fill("white")
                 start = time.time()
                 multithreading(v_window, v_width, v_height, v_spreadX, v_spreadY, t_mouseX, t_mouseY, v_zoom, v_targ, v_w, v_k)
                 end = time.time()
@@ -84,7 +82,7 @@ if __name__ == "__main__":
                 print(end-start)
                 pygame.display.flip()
                 v_title="cap{}.png".format(v_k)
-                pygame.image.save(v_window,"Capture\{}".format(v_title))
+                pygame.image.save(v_window,"Capture_For_Video\{}".format(v_title))
 
         # refresh display
         pygame.display.flip()
