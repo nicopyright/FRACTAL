@@ -6,11 +6,13 @@ from Functions.video_encoding import *
 import pygame
 from multiprocessing import cpu_count
 import time
+from pathlib import Path
 import threading
 
 pygame.init()
 
-
+Path(".\Capture_For_Video").mkdir(parents=True, exist_ok=True)
+Path(".\Capture").mkdir(parents=True, exist_ok=True)
 
 # collect screen's information
 v_screen_size = pygame.display.Info()
@@ -26,7 +28,8 @@ v_targ = "julia"
 v_w = Complex(-1, 0)
 v_width = 400
 v_height = 400
-v_zoom = 100
+v_zoom_initial = 100
+v_zoom = v_zoom_initial
 v_spreadX = cpu_count() * 2
 v_spreadY = cpu_count() * 2
 
@@ -43,7 +46,7 @@ if __name__ == "__main__":
     v_k = 0
 
     start = time.time()
-    multithreading(v_window, v_width, v_height, v_spreadX, v_spreadY, t_mouseX, t_mouseY, v_zoom,v_targ, v_w, v_k)
+    multithreading(v_window, v_width, v_height, v_spreadX, v_spreadY, t_mouseX[v_k], t_mouseY[v_k], v_zoom,v_targ, v_w)
     end = time.time()
     print(end-start)
 
@@ -60,12 +63,15 @@ if __name__ == "__main__":
                     v_cont = False
                 if event.key == pygame.K_e:
                     encode('.\Capture_For_Video\*.png', '.\Videos\project.avi', 3)
+                if event.key == pygame.K_s:
+                    path=new_path(".png","Capture")
+                    pygame.image.save(v_window, path)
             elif event.type == pygame.VIDEORESIZE:
                 v_height = event.h
                 v_width = event.w
                 v_window.fill("white")
                 start = time.time()
-                multithreading(v_window, v_width, v_height, v_spreadX, v_spreadY, t_mouseX, t_mouseY, v_zoom, v_targ, v_w, v_k)
+                multithreading(v_window, v_width, v_height, v_spreadX, v_spreadY, t_mouseX[v_k], t_mouseY[v_k], v_zoom, v_targ, v_w)
                 end = time.time()
                 print(end - start)
 
@@ -75,16 +81,30 @@ if __name__ == "__main__":
                 v_k += 1
                 t_mouseX[v_k] = t_mouseX[v_k - 1] + v_screen_position[0] / v_zoom
                 t_mouseY[v_k] = t_mouseY[v_k - 1] + v_screen_position[1] / v_zoom
-                v_zoom *= 2
+                v_zoom *= 1.5
                 start = time.time()
-                multithreading(v_window, v_width, v_height, v_spreadX, v_spreadY, t_mouseX, t_mouseY, v_zoom,v_targ, v_w, v_k)
+                multithreading(v_window, v_width, v_height, v_spreadX, v_spreadY, t_mouseX[v_k], t_mouseY[v_k], v_zoom,v_targ, v_w)
                 end = time.time()
                 print(end-start)
                 pygame.display.flip()
                 v_title="cap{}.png".format(v_k)
                 pygame.image.save(v_window,"Capture_For_Video\{}".format(v_title))
 
+            elif pygame.mouse.get_pressed()[2]:
+                v_window.fill("white")
+                v_screen_position = screen_to_complex_plan(pygame.mouse.get_pos())
+                start = time.time()
+                for i in range(0,48):
+                    v_zoom *= 1.05
+                    multithreading(v_window, v_width, v_height, v_spreadX, v_spreadY, (v_screen_position[0])/v_zoom_initial, (v_screen_position[1])/v_zoom_initial, v_zoom,v_targ, v_w)
+                    print(i)
+                    v_title="cap{}.png".format(i)
+                    pygame.image.save(v_window,"Capture_For_Video\{}".format(v_title))
+                end = time.time()
+                print("total time: {}".format(end-start))
+                encode('.\Capture_For_Video\*.png', '.\Videos\project.avi', 12)
         # refresh display
         pygame.display.flip()
 
     pygame.quit()
+    EraseFile('.\Capture_For_Video')

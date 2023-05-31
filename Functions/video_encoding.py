@@ -1,5 +1,8 @@
 import cv2
 import glob
+import tkinter
+from tkinter.filedialog import asksaveasfile
+
 
 def EraseFile(directory: "path") -> None:
     """
@@ -21,11 +24,14 @@ def encode(input_directory: "path", output_directory: "path", frame_rate: int) -
     """
     img_array = []
     size=(0,0)
-    for filename in glob.glob(input_directory):
+    i=0
+    for files in glob.glob(input_directory):
+        filename=".\Capture_For_Video\cap{}.png".format(i)
         img = cv2.imread(filename)
         height, width, layers = img.shape
         size = (width,height)
         img_array.append(img)
+        i+=1
 
     if size!=(0,0):
         out = cv2.VideoWriter(output_directory,cv2.VideoWriter_fourcc(*'DIVX'), frame_rate, size)
@@ -34,6 +40,20 @@ def encode(input_directory: "path", output_directory: "path", frame_rate: int) -
             out.write(img_array[i])
         out.release()
         EraseFile('.\Capture_For_Video')
+        print("encode successful")
+    else:
+        print("error during encode")
 
-
-
+def new_path(type: str, path: str) -> str:
+    """
+    :param type: extension of the file to create
+    :param path: initialized path for the user
+    :return: The user new path
+    """
+    root = tkinter.Tk()
+    root.withdraw()
+    root.focus_force()
+    files=[('file', type), ('All Files', '*.*')]
+    path = asksaveasfile(initialdir=path, filetypes=files, defaultextension=files)
+    root.destroy()
+    return path.name

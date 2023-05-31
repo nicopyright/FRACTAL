@@ -1,5 +1,6 @@
 import pygame
-
+import tkinter
+from tkinter.filedialog import asksaveasfile
 
 def tuples_add(A: tuple, B: tuple) -> tuple:
     """
@@ -30,4 +31,3 @@ def screen_to_complex_plan(coord: tuple) -> tuple:
     screen_height = screen_size.current_h
     center = (-screen_width // 2, -screen_height // 2)
     return tuples_add(center, coord)
-
