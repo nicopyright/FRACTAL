@@ -186,8 +186,8 @@ def multithreading(v_window, v_width:int, v_height:int, v_spreadX:int, v_spreadY
 
     elif v_targ == "mandelbrot":
         v_ths = [[Thread(target=mandelbrot, args=(
-            v_window, i * (v_height // v_spreadX), j * (v_width // v_spreadY), (i + 1) * (v_height // v_spreadX),
-            (j + 1) * (v_width // v_spreadY), t_mouseX[v_k], t_mouseY[v_k],
+            v_window, i * (v_width // v_spreadX), j * (v_height // v_spreadY), (i + 1) * (v_width // v_spreadX),
+            (j + 1) * (v_height // v_spreadY), t_mouseX[v_k], t_mouseY[v_k],
             v_zoom)) for i in range(-v_spreadX // 2, v_spreadX // 2)] for j in range(-v_spreadY // 2, v_spreadY // 2)]
 
     for thx in v_ths:
