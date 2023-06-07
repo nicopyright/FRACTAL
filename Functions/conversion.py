@@ -23,8 +23,8 @@ def complex_plan_to_screen(coord: tuple) -> tuple:
 
 def screen_to_complex_plan(coord: tuple) -> tuple:
     """
-    :param coord: Coordinates of the screen to convert to the plane
-    :return: coordinates of the plane for calculus
+    :param coord: Coordinates of the screen to convert to the plan
+    :return: coordinates of the plan for calculus
     """
     screen_size = pygame.display.Info()
     screen_width = screen_size.current_w

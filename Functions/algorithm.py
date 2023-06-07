@@ -148,13 +148,13 @@ def mandelbrot(surface, x0, y0, x1, y1, offset_x: float = 0., offset_y: float = 
             z = Complex(i / zoom + offset_x, j / zoom + offset_y)
             div = divergence(zero, z)
 
-            if divergence(zero,z)[0]:
+            if div[0]:
                 pygame.draw.line(
                     surface,
                     (((v_color_mod-div[1])*255/v_color_mod, (v_color_mod-div[1])*128/v_color_mod, 255)),
                     complex_plan_to_screen((i, j)), complex_plan_to_screen((i, j)))
 
-            elif not divergence(zero,z)[0]:
+            elif not div[0]:
                 pygame.draw.line(
                     surface,
                     ((255-div[1]**2)%255, (255-div[1]**2)%255, (255-div[1]**2)%255),

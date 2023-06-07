@@ -9,8 +9,10 @@ import time
 from pathlib import Path
 import threading
 
+#initialize pygame
 pygame.init()
 
+#crete the directories for the captures if they doesn't exist
 Path(".\Capture_For_Video").mkdir(parents=True, exist_ok=True)
 Path(".\Capture").mkdir(parents=True, exist_ok=True)
 
@@ -22,13 +24,14 @@ v_screen_height = v_screen_size.current_h
 # define the center of the screen
 v_center = (v_screen_width // 2, v_screen_height // 2)
 
-
+#define what fractal it displays between "julia" and "mandelbrot"
 v_targ = "julia"
 
-v_w = Complex(-1, 0)
-v_width = 400
-v_height = 400
-v_zoom_initial = 100
+#main variables
+v_w = Complex(-1, 0.30)
+v_width = 800
+v_height = 800
+v_zoom_initial = 200
 v_zoom = v_zoom_initial
 v_spreadX = cpu_count() * 2
 v_spreadY = cpu_count() * 2
@@ -45,9 +48,12 @@ if __name__ == "__main__":
     t_mouseY = [0.0] * 50
     v_k = 0
 
+    #first fractal to display
     start = time.time()
     multithreading(v_window, v_width, v_height, v_spreadX, v_spreadY, t_mouseX[v_k], t_mouseY[v_k], v_zoom,v_targ, v_w)
     end = time.time()
+
+    #print the time it takes to display it
     print(end-start)
 
     # main loop
@@ -61,8 +67,7 @@ if __name__ == "__main__":
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     v_cont = False
-                if event.key == pygame.K_e:
-                    encode('.\Capture_For_Video\*.png', '.\Videos\project.avi', 3)
+                #if s key is pressed it takes a screenshot and stock it into Capture file
                 if event.key == pygame.K_s:
                     path=new_path(".png","Capture")
                     pygame.image.save(v_window, path)
@@ -74,7 +79,7 @@ if __name__ == "__main__":
                 multithreading(v_window, v_width, v_height, v_spreadX, v_spreadY, t_mouseX[v_k], t_mouseY[v_k], v_zoom, v_targ, v_w)
                 end = time.time()
                 print(end - start)
-
+            # if left click is pressed it zoom one time into the fractal
             elif pygame.mouse.get_pressed()[0]:
                 v_window.fill("white")
                 v_screen_position = screen_to_complex_plan(pygame.mouse.get_pos())
@@ -89,12 +94,12 @@ if __name__ == "__main__":
                 pygame.display.flip()
                 v_title="cap{}.png".format(v_k)
                 pygame.image.save(v_window,"Capture_For_Video\{}".format(v_title))
-
+            # if right click is pressed a video is recorded
             elif pygame.mouse.get_pressed()[2]:
                 v_window.fill("white")
                 v_screen_position = screen_to_complex_plan(pygame.mouse.get_pos())
                 start = time.time()
-                for i in range(0,48):
+                for i in range(0,100):
                     v_zoom *= 1.05
                     multithreading(v_window, v_width, v_height, v_spreadX, v_spreadY, (v_screen_position[0])/v_zoom_initial, (v_screen_position[1])/v_zoom_initial, v_zoom,v_targ, v_w)
                     print(i)
@@ -102,7 +107,7 @@ if __name__ == "__main__":
                     pygame.image.save(v_window,"Capture_For_Video\{}".format(v_title))
                 end = time.time()
                 print("total time: {}".format(end-start))
-                encode('.\Capture_For_Video\*.png', '.\Videos\project.avi', 12)
+                encode('.\Capture_For_Video\*.png', '.\Videos\project.avi', 10)
         # refresh display
         pygame.display.flip()
 
