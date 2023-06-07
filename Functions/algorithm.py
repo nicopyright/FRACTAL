@@ -25,7 +25,7 @@ def divergence(z: Complex(), w: Complex) -> [bool, int]:
     t_reel.append(z.re)
     t_imaginary.append(z.im)
 
-    # Verify if the coordonate diverge
+    # Verify if the coordinate diverge
     for i in range(2, 50):
         velocity += 1
         z = z * z + w
@@ -146,13 +146,13 @@ def mandelbrot(surface, x0, y0, x1, y1, offset_x: float = 0., offset_y: float = 
             z = Complex(i / zoom + offset_x, j / zoom + offset_y)
             div = divergence(zero, z)
 
-            if divergence(zero,z)[0]:
+            if div[0]:
                 pygame.draw.line(
                     surface,
                     (((v_color_mod-div[1])*255/v_color_mod, (v_color_mod-div[1])*128/v_color_mod, 255)),
                     complex_plan_to_screen((i, j)), complex_plan_to_screen((i, j)))
 
-            elif not divergence(zero,z)[0]:
+            elif not div[0]:
                 pygame.draw.line(
                     surface,
                     ((255-div[1]**2)%255, (255-div[1]**2)%255, (255-div[1]**2)%255),
@@ -161,7 +161,7 @@ def mandelbrot(surface, x0, y0, x1, y1, offset_x: float = 0., offset_y: float = 
             pygame.display.flip()
 
 
-def multithreading(v_window, v_width:int, v_height:int, v_spreadX:int, v_spreadY:int, t_mouseX:list, t_mouseY:list, v_zoom:int, v_targ:str, v_w:"Complex", v_k:int = 0):
+def multithreading(v_window, v_width:int, v_height:int, v_spreadX:int, v_spreadY:int, t_mouseX:int, t_mouseY:int, v_zoom:int, v_targ:str, v_w:"Complex"):
     """
     Display the fractal algorithm with multithreading
     :param v_window: Pygame surface on which to display the fractal
@@ -179,9 +179,14 @@ def multithreading(v_window, v_width:int, v_height:int, v_spreadX:int, v_spreadY
     """
     if v_targ == "julia":
         v_ths = [[Thread(target=julia, args=(
-            v_window, i * (v_width // v_spreadX), j * (v_height // v_spreadY), (i + 1) * (v_width // v_spreadX),
-            (j + 1) * (v_height // v_spreadY), v_w,
-            t_mouseX[v_k], t_mouseY[v_k], v_zoom)) for i in range(-v_spreadX // 2, v_spreadX // 2)] for j in
+            v_window,
+            i * (v_width // v_spreadX),
+            j * (v_height // v_spreadY),
+            (i + 1) * (v_width // v_spreadX),
+            (j + 1) * (v_height // v_spreadY),
+            v_w,
+            t_mouseX, t_mouseY,
+            v_zoom)) for i in range(-v_spreadX // 2, v_spreadX // 2)] for j in
                  range(-v_spreadY // 2, v_spreadY // 2)]
 
     elif v_targ == "mandelbrot":

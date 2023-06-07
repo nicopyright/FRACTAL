@@ -8,8 +8,13 @@ import pygame
 from multiprocessing import cpu_count
 import time
 import tkinter as tk
+from pathlib import Path
 
 v_targ = "julia"
+
+#crete the directories for the captures if they doesn't exist
+Path(".\Capture_For_Video").mkdir(parents=True, exist_ok=True)
+Path(".\Capture").mkdir(parents=True, exist_ok=True)
 
 def fractal_change():
     """
@@ -22,7 +27,6 @@ def fractal_change():
     elif v_targ == "mandelbrot":
         v_targ = "julia"
     sv.set(v_targ.capitalize())
-
 
 def fractal():
     pygame.init()
@@ -38,6 +42,8 @@ def fractal():
     v_w = Complex(-1, 0)
     v_width = int(v_screen_width // 2)
     v_height = int(v_screen_height // 2)
+    v_zoom_initial = 200
+    v_zoom = v_zoom_initial
     v_spreadX = cpu_count() * 2
     v_spreadY = cpu_count() * 2
 
@@ -67,6 +73,10 @@ def fractal():
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
+                # if s key is pressed it takes a screenshot and stock it into Capture file
+                if event.key == pygame.K_s:
+                    path = new_path(".png", "Capture")
+                    pygame.image.save(v_window, path)
 
                 if event.key == pygame.K_e:
                     encode('.\Capture_For_Video\*.png', '.\Videos\project.avi', 3)
@@ -81,19 +91,39 @@ def fractal():
                 print(end - start)
 
             elif pygame.mouse.get_pressed()[0]:
-                v_window.fill(background)
+                v_window.fill("white")
                 v_screen_position = screen_to_complex_plan(pygame.mouse.get_pos())
                 v_k += 1
                 t_mouseX[v_k] = t_mouseX[v_k - 1] + v_screen_position[0] / v_zoom
                 t_mouseY[v_k] = t_mouseY[v_k - 1] + v_screen_position[1] / v_zoom
-                v_zoom *= 2
+                v_zoom *= 1.5
                 start = time.time()
-                multithreading(v_window, v_width, v_height, v_spreadX, v_spreadY, t_mouseX, t_mouseY, v_zoom, v_targ, v_w, v_k)
+                multithreading(v_window, v_width, v_height, v_spreadX, v_spreadY, t_mouseX[v_k], t_mouseY[v_k], v_zoom,
+                               v_targ, v_w)
                 end = time.time()
-                print(end-start)
-
-                v_title="cap{}.png".format(v_k)
+                print(end - start)
+                pygame.display.flip()
+                v_title = "cap{}.png".format(v_k)
                 pygame.image.save(v_window, "Capture_For_Video\{}".format(v_title))
+
+            # if right click is pressed a video is recorded
+
+            elif pygame.mouse.get_pressed()[2]:
+                v_window.fill("white")
+                v_screen_position = screen_to_complex_plan(pygame.mouse.get_pos())
+                start = time.time()
+                for i in range(0, 100):
+                    v_zoom *= 1.05
+                    multithreading(v_window, v_width, v_height, v_spreadX, v_spreadY,
+                                   (v_screen_position[0]) / v_zoom_initial, (v_screen_position[1]) / v_zoom_initial,
+                                   v_zoom, v_targ, v_w)
+                    print(i)
+                    v_title = "cap{}.png".format(i)
+                    pygame.image.save(v_window, "Capture_For_Video\{}".format(v_title))
+
+                end = time.time()
+                print("total time: {}".format(end - start))
+                encode('.\Capture_For_Video\*.png', '.\Videos\project.avi', 10)
 
         # refresh display
         pygame.display.flip()
@@ -137,72 +167,6 @@ def menu():
     v_windows_menu.mainloop()
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-"""def menu(v_window, v_width, v_height):
-    i_title = pygame.image.load("Asset/title.png").convert_alpha()
-    i_start1 = pygame.image.load("Asset/start1.png").convert_alpha()
-    i_start2 = pygame.image.load("Asset/start2.png").convert_alpha()
-    i_mandelbrot1 = pygame.image.load("Asset/mandelbrot1.png").convert_alpha()
-    i_mandelbrot2 = pygame.image.load("Asset/mandelbrot2.png").convert_alpha()
-    i_fond = pygame.image.load("Asset/fond1.jpg").convert_alpha()
-    i_title = pygame.transform.scale(i_title, f_resize(i_title, 1.1))
-    i_fond = pygame.transform.scale(i_fond, v_window.get_size())
-    v_window.fill(background)
-    v_cont = True
-    while v_cont:
-        v_window.blit(i_fond, (0, 0))
-        v_window.blit(i_title, (f_center_x(v_window, i_title), 0))
-        v_window.blit(i_start1, (f_center_x(v_window, i_start1), i_title.get_height()))
-        v_window.blit(i_mandelbrot1, (f_center_x(v_window, i_mandelbrot1), i_start1.get_height()))
-
-        if f_center_x(v_window, i_start1) < pygame.mouse.get_pos()[0] < f_center_x(v_window,
-                                                                                   i_start1) + i_start1.get_width() and i_title.get_height() + i_title.get_height() // 2 < \
-                pygame.mouse.get_pos()[1] < i_title.get_height() + i_start1.get_height() - i_title.get_height() // 2:
-
-            v_window.blit(i_start2, (f_center_x(v_window, i_start2), i_title.get_height()))
-            if pygame.mouse.get_pressed()[0]:
-                fractal(v_window, v_width, v_height)
-
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                v_cont = False
-                pygame.quit()
-
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    v_cont = False
-                    pygame.quit()
-
-            elif event.type == pygame.VIDEORESIZE:
-                v_height = event.h
-                v_width = event.w
-                v_window.fill(background)
-                i_fond = pygame.transform.scale(i_fond, v_window.get_size())
-
-
-        pygame.display.flip()
-"""
-
-
-
-
 if __name__ == "__main__":
     menu()
     pygame.display.flip()
-
-
