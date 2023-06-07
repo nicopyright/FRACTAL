@@ -161,7 +161,7 @@ def mandelbrot(surface, x0, y0, x1, y1, offset_x: float = 0., offset_y: float = 
             pygame.display.flip()
 
 
-def multithreading(v_window, v_width:int, v_height:int, v_spreadX:int, v_spreadY:int, t_mouseX:int, t_mouseY:int, v_zoom:int, v_targ:str, v_w:"Complex"):
+def multithreading(v_window, v_width:int, v_height:int, v_spreadX:int, v_spreadY:int, t_mouseX:float, t_mouseY:float, v_zoom:int, v_targ:str, v_w:"Complex"):
     """
     Display the fractal algorithm with multithreading
     :param v_window: Pygame surface on which to display the fractal
@@ -192,7 +192,7 @@ def multithreading(v_window, v_width:int, v_height:int, v_spreadX:int, v_spreadY
     elif v_targ == "mandelbrot":
         v_ths = [[Thread(target=mandelbrot, args=(
             v_window, i * (v_width // v_spreadX), j * (v_height // v_spreadY), (i + 1) * (v_width // v_spreadX),
-            (j + 1) * (v_height // v_spreadY), t_mouseX[v_k], t_mouseY[v_k],
+            (j + 1) * (v_height // v_spreadY), t_mouseX, t_mouseY,
             v_zoom)) for i in range(-v_spreadX // 2, v_spreadX // 2)] for j in range(-v_spreadY // 2, v_spreadY // 2)]
 
     for thx in v_ths:
@@ -202,5 +202,5 @@ def multithreading(v_window, v_width:int, v_height:int, v_spreadX:int, v_spreadY
         for th in thx:
             th.join()
 
-    #pygame.display.flip()
+    pygame.display.flip()
 

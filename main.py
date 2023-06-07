@@ -59,7 +59,7 @@ def fractal():
     v_k = 0
 
     start = time.time()
-    multithreading(v_window, v_width, v_height, v_spreadX, v_spreadY, t_mouseX, t_mouseY, v_zoom, v_targ, v_w, v_k)
+    multithreading(v_window, v_width, v_height, v_spreadX, v_spreadY, t_mouseX[v_k], t_mouseY[v_k], v_zoom, v_targ, v_w)
     end = time.time()
     print(end - start)
 
@@ -107,7 +107,6 @@ def fractal():
                 pygame.image.save(v_window, "Capture_For_Video\{}".format(v_title))
 
             # if right click is pressed a video is recorded
-
             elif pygame.mouse.get_pressed()[2]:
                 v_window.fill("white")
                 v_screen_position = screen_to_complex_plan(pygame.mouse.get_pos())
