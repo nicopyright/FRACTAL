@@ -1,5 +1,7 @@
 # Complex class file.
 # we need to use complexes for the Julia set of fractals
+from math import cos, sin, cosh, sinh, exp
+
 
 class Complex:
     def __init__(self,
@@ -9,8 +11,8 @@ class Complex:
         :param r: reel part of the complex
         :param i: imaginary part of the complex
         """
-        self.re = float(r)
-        self.im = float(i)
+        self.re = r
+        self.im = i
 
     def __repr__(self) -> str:
         """
@@ -47,3 +49,9 @@ class Complex:
         :return: Coordinates with a Tuple
         """
         return self.re, self.im
+
+    def cos(self):
+        return Complex(cos(self.re)*cosh(self.im), -sin(self.re)*sinh(self.im))
+
+    def exp(self):
+        return Complex(exp(self.re)*cos(self.im), exp(self.re)*sin(self.im))
