@@ -12,35 +12,58 @@ from tkinter import ttk
 from pathlib import Path
 
 v_targ = "julia"
-arg_fonc = 1
+v_targ_temp = v_targ
+v_fonct = 1
+v_fonct_temp = 1
 fonctions_frac = ["z² + w", "cos(z) + w"]
+is_saved = True
 
-#crete the directories for the captures if they doesn't exist
+
+#create the directories for the captures if they doesn't exist
 Path(".\Capture_For_Video").mkdir(parents=True, exist_ok=True)
 Path(".\Capture").mkdir(parents=True, exist_ok=True)
 
-def fractal_change():
-    """
-    Fonction to change button Julia or Mandelbrot
-    """
-    global v_targ, sv
-    if v_targ == "julia":
-        v_targ = "mandelbrot"
 
-    elif v_targ == "mandelbrot":
-        v_targ = "julia"
-    sv.set(v_targ.capitalize())
-
+def fractal_change(name):
+    global v_targ_temp, is_saved
+    v_targ_temp = name
+    if is_saved:
+        is_saved = False
+    print("targ_temp : ", v_targ_temp)
+    text_info_tosave.set("Fractal choosen : {} {}\n"
+                         "Fonction choosen : {}".format(v_targ_temp.capitalize(), "" if is_saved else "*",
+                                                        fonctions_frac[v_fonct_temp - 1]))
 
 def action_fonct(event):
-    global arg_fonc
+    global v_fonct_temp, is_saved
     choice = liste_fonc_fract.get()
-    print("Current function : ", choice)
+    print("Fonc_temp : ", choice)
     if choice == "z² + w":
-        arg_fonc = 1
-
+        v_fonct_temp = 1
+        is_saved = False
     elif choice == "cos(z) + w":
-        arg_fonc = 2
+        v_fonct_temp = 2
+        is_saved = False
+    print("is_saved : ", is_saved)
+    text_info_tosave.set("Fractal choosen : {} {}\n"
+                         "Fonction choosen : {}".format(v_targ_temp.capitalize(), "" if is_saved else "*",
+                                                        fonctions_frac[v_fonct_temp - 1]))
+
+
+def save_fonct():
+    global v_targ, v_fonct, is_saved
+    v_targ = v_targ_temp
+    v_fonct = v_fonct_temp
+    is_saved = True
+    text_info_current.set("Current fractal : {}\n"
+                  "Current fonction : {}".format(v_targ.capitalize(), fonctions_frac[v_fonct - 1]))
+    text_info_tosave.set("Fractal choosen : {} {}\n"
+                         "Fonction choosen : {}".format(v_targ_temp.capitalize(), "" if is_saved else "*",
+                                                        fonctions_frac[v_fonct_temp - 1]))
+    print("Current fractal : {}".format(v_targ))
+    print("Current fonction : {}".format(v_fonct))
+    print("is_saved : ", is_saved)
+
 
 def fractal():
     pygame.init()
@@ -69,7 +92,8 @@ def fractal():
     v_k = 0
 
     start = time.time()
-    multithreading(v_window, v_width, v_height, v_spreadX, v_spreadY, t_mouseX[v_k], t_mouseY[v_k], v_zoom, v_targ, v_w, arg_fonc)
+    multithreading(v_window, v_width, v_height, v_spreadX, v_spreadY, t_mouseX[v_k], t_mouseY[v_k], v_zoom, v_targ,
+                   v_w, v_fonct)
     end = time.time()
     print(end - start)
 
@@ -98,7 +122,8 @@ def fractal():
                 v_width = event.w
                 v_window.fill(background)
                 start = time.time()
-                multithreading(v_window, v_width, v_height, v_spreadX, v_spreadY, t_mouseX[v_k], t_mouseY[v_k], v_zoom, v_targ, v_w, arg_fonc)
+                multithreading(v_window, v_width, v_height, v_spreadX, v_spreadY, t_mouseX[v_k], t_mouseY[v_k], v_zoom,
+                               v_targ, v_w, v_fonct)
                 end = time.time()
                 print(end - start)
 
@@ -111,7 +136,7 @@ def fractal():
                 v_zoom *= 1.5
                 start = time.time()
                 multithreading(v_window, v_width, v_height, v_spreadX, v_spreadY, t_mouseX[v_k], t_mouseY[v_k], v_zoom,
-                               v_targ, v_w, arg_fonc)
+                               v_targ, v_w, v_fonct)
                 end = time.time()
                 print(end - start)
                 pygame.display.flip()
@@ -127,7 +152,7 @@ def fractal():
                     v_zoom *= 1.05
                     multithreading(v_window, v_width, v_height, v_spreadX, v_spreadY,
                                    (v_screen_position[0]) / v_zoom_initial, (v_screen_position[1]) / v_zoom_initial,
-                                   v_zoom, v_targ, v_w, arg_fonc)
+                                   v_zoom, v_targ, v_w, v_fonct)
                     print(i)
                     v_title = "cap{}.png".format(i)
                     pygame.image.save(v_window, "Capture_For_Video\{}".format(v_title))
@@ -136,10 +161,59 @@ def fractal():
                 print("total time: {}".format(end - start))
                 encode('.\Capture_For_Video\*.png', '.\Videos\project.avi', 10)
 
+def window_settings():
+    global liste_fonc_fract, text_info_current, text_info_tosave, is_saved
 
-def menu():
-    global sv, liste_fonc_fract
+    v_windows_settings = tk.Tk()
+    v_windows_settings.title("Settings")
+    text_info_current = tk.StringVar(v_windows_settings)
+    text_info_tosave = tk.StringVar(v_windows_settings)
 
+    screen_width = v_windows_settings.winfo_screenwidth()
+    screen_height = v_windows_settings.winfo_screenheight()
+    window_width = screen_width // 2
+    window_height = screen_height // 2
+    x = (screen_width - window_width) // 2
+    y = (screen_height - window_height) // 2
+    v_windows_settings.geometry(f"{window_width}x{window_height}+{x}+{y}")
+
+    title_label = tk.Label(v_windows_settings, text="Settings", font=("Arial", 24, "bold"))
+
+    julia_fract = tk.Button(v_windows_settings, text="Julia",
+                            command=lambda: fractal_change("julia"), font=("Arial", 16, "bold"))
+    mandel_fract = tk.Button(v_windows_settings, text="Mandelbrot",
+                             command=lambda: fractal_change("mandelbrot"), font=("Arial", 16, "bold"))
+
+    liste_fonc_fract = ttk.Combobox(v_windows_settings, values=fonctions_frac, justify='center',
+                                    font=("Arial", 12, "bold"))
+    liste_fonc_fract.current(0)
+    liste_fonc_fract.bind("<<ComboboxSelected>>", action_fonct)
+
+    save_button = tk.Button(v_windows_settings, text="Save", command=save_fonct, font=("Arial", 16, "bold"))
+    close_button = tk.Button(v_windows_settings, text="Close", command=v_windows_settings.destroy,
+                             font=("Arial", 16, "bold"))
+
+    text_info_current.set("Current fractal : {}\n"
+                  "Current fonction : {}".format(v_targ.capitalize(), fonctions_frac[v_fonct - 1]))
+    text_info_current_print = tk.Label(v_windows_settings, textvariable=text_info_current, font=("Arial", 14))
+
+    text_info_tosave.set("Fractal choosen : {} {}\n"
+                         "Fonction choosen : {}".format(v_targ_temp.capitalize(), "" if is_saved else "*",
+                                                        fonctions_frac[v_fonct_temp - 1]))
+
+    text_info_tosave_print = tk.Label(v_windows_settings, textvariable=text_info_tosave, font=("Arial", 14))
+
+    title_label.pack(pady=20, side=tk.TOP)
+    julia_fract.pack(pady=5)
+    mandel_fract.pack(pady=5)
+    liste_fonc_fract.pack(pady=5)
+    text_info_current_print.pack(pady=10, side=tk.RIGHT)
+    text_info_tosave_print.pack(pady=10, side=tk.LEFT)
+    close_button.pack(pady=10, side=tk.BOTTOM)
+    save_button.pack(pady=10, side=tk.BOTTOM)
+
+
+def windows_menu():
     v_windows_menu = tk.Tk()
     v_windows_menu.title("Menu")
 
@@ -155,25 +229,19 @@ def menu():
 
     play_button = tk.Button(v_windows_menu, text="Play", command=fractal, font=("Arial", 16, "bold"))
 
-    sv = tk.StringVar()
-    sv.set(v_targ.capitalize())
-    fract_button = tk.Button(v_windows_menu, textvariable=sv, command=fractal_change, font=("Arial", 16, "bold"))
+    fonct_button = tk.Button(v_windows_menu, text="Change Function", command=window_settings,
+                             font=("Arial", 16, "bold"))
 
     quit_button = tk.Button(v_windows_menu, text="Quit", command=v_windows_menu.destroy, font=("Arial", 16, "bold"))
 
-    liste_fonc_fract = ttk.Combobox(v_windows_menu, values=fonctions_frac, justify='center', font=("Arial", 12, "bold"))
-    liste_fonc_fract.current(0)
-    liste_fonc_fract.bind("<<ComboboxSelected>>", action_fonct)
-
-    title_label.pack(pady=20)
+    title_label.pack(pady=20, side=tk.TOP)
     play_button.pack(pady=10)
-    liste_fonc_fract.pack(pady=5)
-    fract_button.pack(pady=10)
-    quit_button.pack(pady=10)
+    fonct_button.pack(pady=10)
+    quit_button.pack(pady=10, side=tk.BOTTOM)
 
     v_windows_menu.mainloop()
 
 
 if __name__ == "__main__":
-    menu()
+    windows_menu()
     pygame.quit()

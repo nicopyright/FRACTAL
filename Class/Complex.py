@@ -53,5 +53,8 @@ class Complex:
     def cos(self):
         return Complex(cos(self.re)*cosh(self.im), -sin(self.re)*sinh(self.im))
 
+    def sin(self):
+        return Complex(sin(self.re)*cosh(self.im), cos(self.re)*sinh(self.im))
+
     def exp(self):
         return Complex(exp(self.re)*cos(self.im), exp(self.re)*sin(self.im))
