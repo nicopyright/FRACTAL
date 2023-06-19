@@ -1,9 +1,9 @@
 
 ![Logo](readme_img/Logo_Julia.png)
 
-__<span style=" font-size:4em;"> Fractals </span>__
+# FRACTALS
 
-Fractals is a school project to <span style="color: purple;">_ _ init _ _</span> ourselves to python.  
+Fractals is a school project to _ _ init _ _ ourselves to python.  
 This projects is a program that generates fractals and display them.
 
 ---
@@ -22,12 +22,14 @@ The color and gray intensity are define by the velocity of the convergence or di
 
 ## Some examples of fractals :
 ![example julia](readme_img/Julia.png)
+
 <div align="center">
   Julia fractal with constant complex to -1
 </div>
 
 
 ![example mandelbrot](readme_img/Mandelbrot.png)
+
 <div align="center">
   Mandelbrot fractal
 </div>
