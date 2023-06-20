@@ -5,7 +5,7 @@ from threading import Thread
 
 v_color_mod = 50
 
-def div_fonct(arg_z: Complex, arg_w: Complex, arg_fonc: int):
+def f_div_fonct(arg_z: Complex, arg_w: Complex, arg_fonc: int):
     if arg_fonc == 1:
         return arg_z * arg_z + arg_w
 
@@ -16,11 +16,11 @@ def div_fonct(arg_z: Complex, arg_w: Complex, arg_fonc: int):
         return (Complex(-1, 0)*arg_z*arg_z).exp() + arg_w
 
 
-def divergence(z: Complex, w: Complex, arg_fonc: int) -> [bool, int]:
+def f_divergence(arg_z: Complex, arg_w: Complex, arg_sequence: int) -> [bool, int]:
     """
     Verify if the coordinates diverge with the equation z² + w
-    :param z: complex for each coordinates
-    :param w: complex number for the Julia set
+    :param arg_z: complex for each coordinates
+    :param arg_w: complex number for the Julia set
     :return: [bool, int]
     """
 
@@ -32,16 +32,16 @@ def divergence(z: Complex, w: Complex, arg_fonc: int) -> [bool, int]:
     # Initial conditions
     velocity = 2  # Divergence velocity to put colors
     try:
-        z = div_fonct(z, w, arg_fonc)  #(Complex(-1, 0)*z*z).exp() + w #z.cos() + w  #z * z + w
-        t_reel.append(z.re)
-        t_imaginary.append(z.im)
+        arg_z = f_div_fonct(arg_z, arg_w, arg_sequence)  #(Complex(-1, 0)*z*z).exp() + w #z.cos() + w  #z * z + w
+        t_reel.append(arg_z.re)
+        t_imaginary.append(arg_z.im)
     except:
         return [False, velocity]
 
     try:
-        z = div_fonct(z, w, arg_fonc)
-        t_reel.append(z.re)
-        t_imaginary.append(z.im)
+        arg_z = f_div_fonct(arg_z, arg_w, arg_sequence)
+        t_reel.append(arg_z.re)
+        t_imaginary.append(arg_z.im)
     except:
         return [False, velocity]
 
@@ -49,12 +49,12 @@ def divergence(z: Complex, w: Complex, arg_fonc: int) -> [bool, int]:
     for i in range(2, 50):
         velocity += 1
         try :
-            z = div_fonct(z, w, arg_fonc)
+            arg_z = f_div_fonct(arg_z, arg_w, arg_sequence)
         except:
             return [False, velocity]
 
-        t_reel.append(z.re)
-        t_imaginary.append(z.im)
+        t_reel.append(arg_z.re)
+        t_imaginary.append(arg_z.im)
 
         # Verify if the equation diverge
         if t_reel[i] >= 10 or t_imaginary[i] >= 10 or t_reel[i] <= -10 or t_imaginary[i] <= -10:
@@ -67,11 +67,11 @@ def divergence(z: Complex, w: Complex, arg_fonc: int) -> [bool, int]:
     return [True, velocity]
 
 
-def julia(surface: [pygame.Surface, pygame.SurfaceType],
-          x0: int, y0: int, x1: int, y1: int, arg_fonc: int,
-          w: Complex = Complex(-1.0, 0.0),
-          offset_x: float = 0., offset_y: float = 0.,
-          zoom: float = 300.) -> None:
+def f_julia(surface: [pygame.Surface, pygame.SurfaceType],
+            x0: int, y0: int, x1: int, y1: int, arg_fonc: int,
+            w: Complex = Complex(-1.0, 0.0),
+            offset_x: float = 0., offset_y: float = 0.,
+            zoom: float = 300.) -> None:
     """
     Display the Julia set linked to w on a rectangle with (x0,y0) on the top left coordinates
     and (x1,y1) on the bottom right coordinates
@@ -116,20 +116,20 @@ def julia(surface: [pygame.Surface, pygame.SurfaceType],
             z = Complex(i / zoom + offset_x, j / zoom + offset_y)
 
             # Use the function divergence() to display the right color one the screen
-            div = divergence(z, w, arg_fonc)
-            pos = complex_plan_to_screen((i, j))
+            div = f_divergence(z, w, arg_fonc)
+            pos = f_complex_plan_to_screen((i, j))
             if div[0]:
 
                 pygame.draw.line(surface,
                                  (((v_color_mod-div[1])*255/v_color_mod, (v_color_mod-div[1])*128/v_color_mod, 255)),
-                                 complex_plan_to_screen((i, j)), complex_plan_to_screen((i, j)))
+                                 f_complex_plan_to_screen((i, j)), f_complex_plan_to_screen((i, j)))
 
                 #surface.set_at((pos[0], pos[1]), (((v_color_mod-div[1])*255/v_color_mod, (v_color_mod-div[1])*128/v_color_mod, 255)))
 
             else:
                 pygame.draw.line(surface,
                                  ((255-div[1]**2)%255, (255-div[1]**2)%255, (255-div[1]**2)%255),
-                                 complex_plan_to_screen((i, j)), complex_plan_to_screen((i, j)))
+                                 f_complex_plan_to_screen((i, j)), f_complex_plan_to_screen((i, j)))
 
                 #surface.set_at((pos[0], pos[1]), ((255-div[1]**2)%255, (255-div[1]**2)%255, (255-div[1]**2)%255))
 
@@ -137,8 +137,8 @@ def julia(surface: [pygame.Surface, pygame.SurfaceType],
             pygame.display.flip()
 
 
-def mandelbrot(surface: [pygame.Surface, pygame.SurfaceType],
-          x0: int, y0: int, x1: int, y1: int, arg_fonc: int, offset_x: float = 0., offset_y: float = 0., zoom: float = 300.):
+def f_mandelbrot(surface: [pygame.Surface, pygame.SurfaceType],
+                 x0: int, y0: int, x1: int, y1: int, arg_fonc: int, offset_x: float = 0., offset_y: float = 0., zoom: float = 300.):
     """
         Display the Mandelbrot set linked to w on a rectangle with (x0,y0) on the top left coordinates
         and (x1,y1) on the bottom right coordinates
@@ -169,24 +169,24 @@ def mandelbrot(surface: [pygame.Surface, pygame.SurfaceType],
             if invj:
                 j = y1 - j + y0
             z = Complex(i / zoom + offset_x, j / zoom + offset_y)
-            div = divergence(zero, z, arg_fonc)
+            div = f_divergence(zero, z, arg_fonc)
 
             if div[0]:
                 pygame.draw.line(
                     surface,
                     (((v_color_mod-div[1])*255/v_color_mod, (v_color_mod-div[1])*128/v_color_mod, 255)),
-                    complex_plan_to_screen((i, j)), complex_plan_to_screen((i, j)))
+                    f_complex_plan_to_screen((i, j)), f_complex_plan_to_screen((i, j)))
 
             elif not div[0]:
                 pygame.draw.line(
                     surface,
                     ((255-div[1]**2)%255, (255-div[1]**2)%255, (255-div[1]**2)%255),
-                    complex_plan_to_screen((i, j)), complex_plan_to_screen((i, j)))
+                    f_complex_plan_to_screen((i, j)), f_complex_plan_to_screen((i, j)))
 
             pygame.display.flip()
 
 
-def multithreading(v_window, v_width:int, v_height:int, v_spreadX:int, v_spreadY:int, t_mouseX:float, t_mouseY:float, v_zoom:int, v_targ:str, v_w: Complex, arg_fonc: int):
+def f_multithreading(v_window, v_width:int, v_height:int, v_spreadX:int, v_spreadY:int, t_mouseX:float, t_mouseY:float, v_zoom:int, v_targ:str, v_w: Complex, arg_fonc: int):
     """
     Display the fractal algorithm with multithreading
     :param v_window: Pygame surface on which to display the fractal
@@ -203,7 +203,7 @@ def multithreading(v_window, v_width:int, v_height:int, v_spreadX:int, v_spreadY
     :return: None
     """
     if v_targ == "julia":
-        v_ths = [[Thread(target=julia, args=(
+        v_ths = [[Thread(target=f_julia, args=(
             v_window,
             i * (v_width // v_spreadX),
             j * (v_height // v_spreadY),
@@ -215,7 +215,7 @@ def multithreading(v_window, v_width:int, v_height:int, v_spreadX:int, v_spreadY
                  range(-v_spreadY // 2, v_spreadY // 2)]
 
     elif v_targ == "mandelbrot":
-        v_ths = [[Thread(target=mandelbrot, args=(
+        v_ths = [[Thread(target=f_mandelbrot, args=(
             v_window, i * (v_width // v_spreadX), j * (v_height // v_spreadY), (i + 1) * (v_width // v_spreadX),
             (j + 1) * (v_height // v_spreadY), arg_fonc, t_mouseX, t_mouseY,
             v_zoom)) for i in range(-v_spreadX // 2, v_spreadX // 2)] for j in range(-v_spreadY // 2, v_spreadY // 2)]
