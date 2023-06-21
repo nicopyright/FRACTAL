@@ -1,6 +1,4 @@
 import pygame
-import tkinter
-from tkinter.filedialog import asksaveasfile
 
 def f_tuples_add(A: tuple, B: tuple) -> tuple:
     """

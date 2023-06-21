@@ -1,11 +1,17 @@
-import pygame
-from Class.Complex import *
+from Models.Complex import *
 from Functions.conversion import *
 from threading import Thread
 
 v_color_mod = 50
 
 def f_div_fonct(arg_z: Complex, arg_w: Complex, arg_fonc: int):
+    """
+    Choose sequence to use
+    :param arg_z: complex
+    :param arg_w: complex
+    :param arg_fonc: sequence to use
+    :return: an equation
+    """
     if arg_fonc == 1:
         return arg_z * arg_z + arg_w
 

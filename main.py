@@ -1,14 +1,12 @@
 # Import  libraries
-from Class.Complex import *
+from Models.Complex import *
 from Functions.algorithm import *
 from Functions.conversion import *
 from Functions.video_encoding import *
-from Functions.display import *
 import pygame
 from multiprocessing import cpu_count
 import time
 import tkinter as tk
-from tkinter import messagebox
 from tkinter import ttk
 from pathlib import Path
 
@@ -35,6 +33,7 @@ b_is_saved = True
 # Create the directories for the captures if they don't exist
 Path(".\Capture_For_Video").mkdir(parents=True, exist_ok=True)
 Path(".\Capture").mkdir(parents=True, exist_ok=True)
+icon = "Asset/icon.ico"
 
 
 def f_fractal_change(arg_name: str):
@@ -101,29 +100,32 @@ def f_fractal():
     v_screen_height = v_screen_size.current_h
     print(v_screen_width, v_screen_height)
 
+    icon_ = pygame.image.load(icon)
+
     v_w = Complex(-1, 0)
     v_width = int(v_screen_width // 2)
     v_height = int(v_screen_height // 2)
-    v_zoom_initial = 50
+    v_zoom_initial = 100
     v_spreadX = cpu_count() * 2
     v_spreadY = cpu_count() * 2
 
     v_background = "white"
 
-    tkw_window = pygame.display.set_mode((v_width, v_height), pygame.RESIZABLE)
+    pw_window = pygame.display.set_mode((v_width, v_height), pygame.RESIZABLE)
+    pygame.display.set_icon(icon_)
     b_cont = True
     v_zoom = v_zoom_initial
-    tkw_window.fill(v_background)
+    pw_window.fill(v_background)
 
     l_mouse_x = [0.0] * 500
     l_mouse_y = [0.0] * 500
     v_k = 0
 
     v_start = time.time()
-    f_multithreading(tkw_window, v_width, v_height, v_spreadX, v_spreadY, l_mouse_x[v_k], l_mouse_y[v_k], v_zoom, v_targ,
+    f_multithreading(pw_window, v_width, v_height, v_spreadX, v_spreadY, l_mouse_x[v_k], l_mouse_y[v_k], v_zoom, v_targ,
                      v_w, v_fonct)
     v_end = time.time()
-    print(v_end - v_start)
+    print("Time : ", v_end - v_start)
 
     # main loop
     while b_cont:
@@ -138,58 +140,79 @@ def f_fractal():
                     b_cont = False
                     pygame.quit()
                 # if s key is pressed it takes a screenshot and stock it into Capture file
-                if event.key == pygame.K_s:
+                elif event.key == pygame.K_s:
                     path = new_path(".png", "Capture")
-                    pygame.image.save(tkw_window, path)
+                    pygame.image.save(pw_window, path)
 
-                if event.key == pygame.K_e:
+                elif event.key == pygame.K_e:
                     encode('.\Capture_For_Video\*.png', '.\Videos\project.avi', 3)
+
+                elif event.key == pygame.K_v:
+                    pw_window.fill("white")
+                    v_screen_position = f_screen_to_complex_plan(pygame.mouse.get_pos())
+                    v_start = time.time()
+                    for i in range(0, 2):
+                        v_zoom *= 1.05
+                        f_multithreading(pw_window, v_width, v_height, v_spreadX, v_spreadY,
+                                         (v_screen_position[0]) / v_zoom_initial,
+                                         (v_screen_position[1]) / v_zoom_initial,
+                                         v_zoom, v_targ, v_w, v_fonct)
+                        print(i)
+                        v_title = "cap{}.png".format(i)
+                        pygame.image.save(pw_window, "Capture_For_Video\{}".format(v_title))
+
+                    v_end = time.time()
+                    print("total time: {}".format(v_end - v_start))
+                    encode('.\Capture_For_Video\*.png', '.\Videos\project.avi', 10)
 
             elif event.type == pygame.VIDEORESIZE:
                 v_height = event.h
                 v_width = event.w
-                tkw_window.fill(v_background)
+                pw_window.fill(v_background)
                 v_start = time.time()
-                f_multithreading(tkw_window, v_width, v_height, v_spreadX, v_spreadY, l_mouse_x[v_k], l_mouse_y[v_k],
+                f_multithreading(pw_window, v_width, v_height, v_spreadX, v_spreadY, l_mouse_x[v_k], l_mouse_y[v_k],
                                  v_zoom,
                                  v_targ, v_w, v_fonct)
                 v_end = time.time()
-                print(v_end - v_start)
+                print("Time : ", v_end - v_start)
 
             elif pygame.mouse.get_pressed()[0]:
-                tkw_window.fill("white")
+                pw_window.fill("white")
                 v_screen_position = f_screen_to_complex_plan(pygame.mouse.get_pos())
                 v_k += 1
                 l_mouse_x[v_k] = l_mouse_x[v_k - 1] + v_screen_position[0] / v_zoom
                 l_mouse_y[v_k] = l_mouse_y[v_k - 1] + v_screen_position[1] / v_zoom
                 v_zoom *= 1.5
                 v_start = time.time()
-                f_multithreading(tkw_window, v_width, v_height, v_spreadX, v_spreadY, l_mouse_x[v_k], l_mouse_y[v_k],
+                f_multithreading(pw_window, v_width, v_height, v_spreadX, v_spreadY, l_mouse_x[v_k], l_mouse_y[v_k],
                                  v_zoom,
                                  v_targ, v_w, v_fonct)
                 v_end = time.time()
-                print(v_end - v_start)
+                print("Time : ", v_end - v_start)
                 pygame.display.flip()
                 v_title = "cap{}.png".format(v_k)
-                pygame.image.save(tkw_window, "Capture_For_Video\{}".format(v_title))
+                pygame.image.save(pw_window, "Capture_For_Video\{}".format(v_title))
 
             # if right click is pressed a video is recorded
             elif pygame.mouse.get_pressed()[2]:
-                tkw_window.fill("white")
+                pw_window.fill("white")
                 v_screen_position = f_screen_to_complex_plan(pygame.mouse.get_pos())
+                v_k += 1
+                l_mouse_x[v_k] = l_mouse_x[v_k - 1] + v_screen_position[0] / v_zoom
+                l_mouse_y[v_k] = l_mouse_y[v_k - 1] + v_screen_position[1] / v_zoom
+                v_zoom /= 1.5
                 v_start = time.time()
-                for i in range(0, 100):
-                    v_zoom *= 1.05
-                    f_multithreading(tkw_window, v_width, v_height, v_spreadX, v_spreadY,
-                                     (v_screen_position[0]) / v_zoom_initial, (v_screen_position[1]) / v_zoom_initial,
-                                     v_zoom, v_targ, v_w, v_fonct)
-                    print(i)
-                    v_title = "cap{}.png".format(i)
-                    pygame.image.save(tkw_window, "Capture_For_Video\{}".format(v_title))
-
+                f_multithreading(pw_window, v_width, v_height, v_spreadX, v_spreadY, l_mouse_x[v_k], l_mouse_y[v_k],
+                                 v_zoom,
+                                 v_targ, v_w, v_fonct)
                 v_end = time.time()
-                print("total time: {}".format(v_end - v_start))
-                encode('.\Capture_For_Video\*.png', '.\Videos\project.avi', 10)
+                print("Time : ", v_end - v_start)
+                pygame.display.flip()
+                v_title = "cap{}.png".format(v_k)
+                pygame.image.save(pw_window, "Capture_For_Video\{}".format(v_title))
+
+
+
 
 
 def f_window_settings():
@@ -199,6 +222,7 @@ def f_window_settings():
     global tkcb_sequence_list, tksv_text_info_current, tksv_text_info_tosave, b_is_saved
 
     v_windows_settings = tk.Tk()
+    v_windows_settings.iconbitmap(icon)
 
     v_windows_settings.title("Settings")
     tksv_text_info_current = tk.StringVar(v_windows_settings)
@@ -221,6 +245,7 @@ def f_window_settings():
 
     tkcb_sequence_list = ttk.Combobox(v_windows_settings, values=l_sequence, justify='center',
                                       font=("Arial", 12, "bold"))
+
     tkcb_sequence_list.current(0)
     tkcb_sequence_list.bind("<<ComboboxSelected>>", f_action_sequence)
 
@@ -254,6 +279,7 @@ def f_windows_menu():
     """
     v_windows_menu = tk.Tk()
     v_windows_menu.title("Menu")
+    v_windows_menu.iconbitmap(icon)
 
     screen_width = v_windows_menu.winfo_screenwidth()
     screen_height = v_windows_menu.winfo_screenheight()

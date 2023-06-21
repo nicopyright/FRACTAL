@@ -31,13 +31,19 @@ def slider_function(arg_width: int, arg_height: int, arg_zoom_initial: int, arg_
     :return:
     """
     def button_pressed():
-        # Call the confirm method for each slider to update their return values
+        """
+        Call the confirm method for each slider to update their return values
+        :return arg_width, arg_height, arg_zoom_initial, arg_re_w, arg_im_w
+        """
         for slider in sliders:
             slider.confirm()
             slider.state = True
 
-    def on_closing(state):
-        # Check if any slider's state is False and prompt a confirmation message box
+    def on_closing(state: bool):
+        """
+        Check if any slider's state is False and prompt a confirmation message box
+        :param state: boolean
+        """
         for slider in sliders:
             state *= slider.state
         if not state:
